@@ -5,7 +5,7 @@ description: Discover how to lazy load assemblies in Blazor WebAssembly apps.
 monikerRange: '>= aspnetcore-5.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/09/2021
+ms.date: 11/08/2022
 uid: blazor/webassembly-lazy-load-assemblies
 ---
 # Lazy load assemblies in ASP.NET Core Blazor WebAssembly
@@ -64,7 +64,7 @@ In the following example:
 @inject LazyAssemblyLoader AssemblyLoader
 @inject ILogger<App> Logger
 
-<Router AppAssembly="@typeof(Program).Assembly" 
+<Router AppAssembly="@typeof(App).Assembly" 
     OnNavigateAsync="@OnNavigateAsync">
     ...
 </Router>
@@ -111,7 +111,7 @@ In the following example:
 @inject LazyAssemblyLoader AssemblyLoader
 @inject ILogger<App> Logger
 
-<Router AppAssembly="@typeof(Program).Assembly" 
+<Router AppAssembly="@typeof(App).Assembly" 
     AdditionalAssemblies="@lazyLoadedAssemblies" 
     OnNavigateAsync="@OnNavigateAsync">
     ...
@@ -152,7 +152,7 @@ For more information, see <xref:blazor/fundamentals/routing#user-interaction-wit
 
 ## Handle cancellations in `OnNavigateAsync`
 
-The <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext> object passed to the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback contains a <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext.CancellationToken> that's set when a new navigation event occurs. The <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback must throw when the cancellation token is set to avoid continuing to run the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback on a outdated navigation.
+The <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext> object passed to the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback contains a <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext.CancellationToken> that's set when a new navigation event occurs. The <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback must throw when the cancellation token is set to avoid continuing to run the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback on an outdated navigation.
 
 For more information, see <xref:blazor/fundamentals/routing#handle-cancellations-in-onnavigateasync>.
 
@@ -167,15 +167,15 @@ To rectify this:
 
 ## Lazy load assemblies in a hosted Blazor WebAssembly solution
 
-The framework's lazy loading implementation supports lazy loading with prerendering in a hosted Blazor WebAssembly [solution](xref:blazor/tooling#visual-studio-solution-file-sln). During prerendering, all assemblies, including those marked for lazy loading, are assumed to be loaded. Manually register the <xref:Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader> service in the **`Server`** project.
+The framework's lazy loading implementation supports lazy loading with prerendering in a hosted Blazor WebAssembly [solution](xref:blazor/tooling#visual-studio-solution-file-sln). During prerendering, all assemblies, including those marked for lazy loading, are assumed to be loaded. Manually register the <xref:Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader> service in the **:::no-loc text="Server":::** project.
 
-At the top of the `Program.cs` file of the **`Server`** project, add the namespace for <xref:Microsoft.AspNetCore.Components.WebAssembly.Services?displayProperty=fullName>:
+At the top of the `Program.cs` file of the **:::no-loc text="Server":::** project, add the namespace for <xref:Microsoft.AspNetCore.Components.WebAssembly.Services?displayProperty=fullName>:
 
 ```csharp
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
 ```
 
-In `Program.cs` of the **`Server`** project, register the service:
+In `Program.cs` of the **:::no-loc text="Server":::** project, register the service:
 
 ```csharp
 builder.Services.AddScoped<LazyAssemblyLoader>();
@@ -193,7 +193,7 @@ The demonstration in this section:
    * Visual Studio: **Create a solution** > **Create a new project** > **Razor Class Library**. Name the project `GrantImaharaRobotControls`.
    * Visual Studio Code/.NET CLI: Execute `dotnet new razorclasslib -o GrantImaharaRobotControls` from a command prompt. The `-o|--output` option creates a folder for the [solution](xref:blazor/tooling#visual-studio-solution-file-sln) and names the project `GrantImaharaRobotControls`.
 
-1. The example component presented later in this section uses a [Blazor form](xref:blazor/forms-validation). In the RCL project, add the [`Microsoft.AspNetCore.Components.Forms`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.Forms) package to the project.
+1. The example component presented later in this section uses a [Blazor form](xref:blazor/forms-and-input-components). In the RCL project, add the [`Microsoft.AspNetCore.Components.Forms`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.Forms) package to the project.
 
    [!INCLUDE[](~/includes/package-reference.md)]
 
@@ -310,7 +310,7 @@ Configure the app to lazy load the `GrantImaharaRobotControls.dll` assembly:
    @inject LazyAssemblyLoader AssemblyLoader
    @inject ILogger<App> Logger
 
-   <Router AppAssembly="@typeof(Program).Assembly"
+   <Router AppAssembly="@typeof(App).Assembly"
            AdditionalAssemblies="@lazyLoadedAssemblies" 
            OnNavigateAsync="@OnNavigateAsync">
        <Navigating>
@@ -354,7 +354,7 @@ Build and run the app again. For the default page that loads the `Index` compone
 
 ![Index component loaded in the browser with developer tool's Network tab indicating that the GrantImaharaRobotControls.dll assembly isn't loaded.](~/blazor/webassembly-lazy-load-assemblies/_static/screenshot2.png)
 
-If the `Robot` component from the RCL is requested at `https://localhost:5001/robot`, the `GrantImaharaRobotControls.dll` assembly is loaded and the `Robot` component is rendered:
+If the `Robot` component from the RCL is requested at `/robot`, the `GrantImaharaRobotControls.dll` assembly is loaded and the `Robot` component is rendered:
 
 ![Robot component loaded in the browser with developer tool's Network tab indicating that the GrantImaharaRobotControls.dll assembly is loaded.](~/blazor/webassembly-lazy-load-assemblies/_static/screenshot3.png)
 
@@ -362,9 +362,6 @@ If the `Robot` component from the RCL is requested at `https://localhost:5001/ro
 
 * If unexpected rendering occurs, such as rendering a component from a previous navigation, confirm that the code throws if the cancellation token is set.
 * If assemblies configured for lazy loading unexpectedly load at app start, check that the assembly is marked for lazy loading in the project file.
-
-> [!NOTE]
-> A known issue exists for loading types from a lazily-loaded assembly. For more information, see [Blazor WebAssembly lazy loading assemblies not working when using @ref attribute in the component (dotnet/aspnetcore #29342)](https://github.com/dotnet/aspnetcore/issues/29342).
 
 ## Additional resources
 
@@ -520,7 +517,7 @@ For more information, see <xref:blazor/fundamentals/routing#user-interaction-wit
 
 ## Handle cancellations in `OnNavigateAsync`
 
-The <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext> object passed to the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback contains a <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext.CancellationToken> that's set when a new navigation event occurs. The <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback must throw when the cancellation token is set to avoid continuing to run the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback on a outdated navigation.
+The <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext> object passed to the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback contains a <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext.CancellationToken> that's set when a new navigation event occurs. The <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback must throw when the cancellation token is set to avoid continuing to run the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback on an outdated navigation.
 
 For more information, see <xref:blazor/fundamentals/routing#handle-cancellations-in-onnavigateasync>.
 
@@ -535,15 +532,15 @@ To rectify this:
 
 ## Lazy load assemblies in a hosted Blazor WebAssembly solution
 
-The framework's lazy loading implementation supports lazy loading with prerendering in a hosted Blazor WebAssembly [solution](xref:blazor/tooling#visual-studio-solution-file-sln). During prerendering, all assemblies, including those marked for lazy loading, are assumed to be loaded. Manually register the <xref:Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader> service in the **`Server`** project.
+The framework's lazy loading implementation supports lazy loading with prerendering in a hosted Blazor WebAssembly [solution](xref:blazor/tooling#visual-studio-solution-file-sln). During prerendering, all assemblies, including those marked for lazy loading, are assumed to be loaded. Manually register the <xref:Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader> service in the **:::no-loc text="Server":::** project.
 
-At the top of the `Startup.cs` file of the **`Server`** project, add the namespace for <xref:Microsoft.AspNetCore.Components.WebAssembly.Services?displayProperty=fullName>:
+At the top of the `Startup.cs` file of the **:::no-loc text="Server":::** project, add the namespace for <xref:Microsoft.AspNetCore.Components.WebAssembly.Services?displayProperty=fullName>:
 
 ```csharp
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
 ```
 
-In the `Startup.ConfigureServices` method (`Startup.cs`) of the **`Server`** project, register the service:
+In the `Startup.ConfigureServices` method (`Startup.cs`) of the **:::no-loc text="Server":::** project, register the service:
 
 ```csharp
 services.AddScoped<LazyAssemblyLoader>();
@@ -561,7 +558,7 @@ The demonstration in this section:
    * Visual Studio: **Create a solution** > **Create a new project** > **Razor Class Library**. Name the project `GrantImaharaRobotControls`.
    * Visual Studio Code/.NET CLI: Execute `dotnet new razorclasslib -o GrantImaharaRobotControls` from a command prompt. The `-o|--output` option creates a folder for the [solution](xref:blazor/tooling#visual-studio-solution-file-sln) and names the project `GrantImaharaRobotControls`.
 
-1. The example component presented later in this section uses a [Blazor form](xref:blazor/forms-validation). In the RCL project, add the [`Microsoft.AspNetCore.Components.Forms`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.Forms) package to the project.
+1. The example component presented later in this section uses a [Blazor form](xref:blazor/forms-and-input-components). In the RCL project, add the [`Microsoft.AspNetCore.Components.Forms`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.Forms) package to the project.
 
    [!INCLUDE[](~/includes/package-reference.md)]
 
@@ -724,7 +721,7 @@ Build and run the app again. For the default page that loads the `Index` compone
 
 ![Index component loaded in the browser with developer tool's Network tab indicating that the GrantImaharaRobotControls.dll assembly isn't loaded.](~/blazor/webassembly-lazy-load-assemblies/_static/screenshot2.png)
 
-If the `Robot` component from the RCL is requested at `https://localhost:5001/robot`, the `GrantImaharaRobotControls.dll` assembly is loaded and the `Robot` component is rendered:
+If the `Robot` component from the RCL is requested at `/robot`, the `GrantImaharaRobotControls.dll` assembly is loaded and the `Robot` component is rendered:
 
 ![Robot component loaded in the browser with developer tool's Network tab indicating that the GrantImaharaRobotControls.dll assembly is loaded.](~/blazor/webassembly-lazy-load-assemblies/_static/screenshot3.png)
 

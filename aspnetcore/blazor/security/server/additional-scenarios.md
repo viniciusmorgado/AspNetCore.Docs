@@ -5,7 +5,7 @@ description: Learn how to configure Blazor Server for additional security scenar
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/09/2021
+ms.date: 11/08/2022
 uid: blazor/security/server/additional-scenarios
 ---
 # ASP.NET Core Blazor Server additional security scenarios
@@ -43,8 +43,8 @@ Define a **scoped** token provider service that can be used within the Blazor ap
 ```csharp
 public class TokenProvider
 {
-    public string AccessToken { get; set; }
-    public string RefreshToken { get; set; }
+    public string? AccessToken { get; set; }
+    public string? RefreshToken { get; set; }
 }
 ```
 
@@ -63,8 +63,8 @@ Define a class to pass in the initial app state with the access and refresh toke
 ```csharp
 public class InitialApplicationState
 {
-    public string AccessToken { get; set; }
-    public string RefreshToken { get; set; }
+    public string? AccessToken { get; set; }
+    public string? RefreshToken { get; set; }
 }
 ```
 
@@ -96,12 +96,12 @@ In the `App` component (`App.razor`), resolve the service and initialize it with
 
 @code {
     [Parameter]
-    public InitialApplicationState InitialState { get; set; }
+    public InitialApplicationState? InitialState { get; set; }
 
     protected override Task OnInitializedAsync()
     {
-        TokenProvider.AccessToken = InitialState.AccessToken;
-        TokenProvider.RefreshToken = InitialState.RefreshToken;
+        TokenProvider.AccessToken = InitialState?.AccessToken;
+        TokenProvider.RefreshToken = InitialState?.RefreshToken;
 
         return base.OnInitializedAsync();
     }

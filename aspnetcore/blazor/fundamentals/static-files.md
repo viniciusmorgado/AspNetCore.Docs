@@ -5,7 +5,7 @@ description: Learn how to configure and manage static files for Blazor apps.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/09/2021
+ms.date: 11/08/2022
 uid: blazor/fundamentals/static-files
 ---
 # ASP.NET Core Blazor static files
@@ -18,9 +18,25 @@ For more information on *solutions* in sections that apply to hosted Blazor WebA
 
 ## Static File Middleware
 
-*This section applies to Blazor Server apps and the `**Server**` app of a hosted Blazor WebAssembly solution.*
+*This section applies to Blazor Server apps and the **:::no-loc text="Server":::** app of a hosted Blazor WebAssembly solution.*
 
 Configure Static File Middleware to serve static assets to clients by calling <xref:Microsoft.AspNetCore.Builder.StaticFileExtensions.UseStaticFiles%2A> in the app's request processing pipeline. For more information, see <xref:fundamentals/static-files>.
+
+## Static files in non-`Development` environments for Blazor Server apps
+
+*This section applies to Blazor Server apps.*
+
+In Blazor Server apps run locally, static web assets are only enabled by default in the <xref:Microsoft.Extensions.Hosting.Environments.Development> environment. To enable static files for environments other than <xref:Microsoft.Extensions.Hosting.Environments.Development> during local development and testing (for example, <xref:Microsoft.Extensions.Hosting.Environments.Staging>), call <xref:Microsoft.AspNetCore.Hosting.WebHostBuilderExtensions.UseStaticWebAssets%2A> on the <xref:Microsoft.AspNetCore.Builder.WebApplicationBuilder> in `Program.cs`.
+
+> [!WARNING]
+> Call <xref:Microsoft.AspNetCore.Hosting.WebHostBuilderExtensions.UseStaticWebAssets%2A> for the ***exact environment*** to prevent activating the feature in production, as it serves files from separate locations on disk *other than from the project* if called in a production environment. The example in this section checks for the <xref:Microsoft.Extensions.Hosting.Environments.Staging> environment by calling <xref:Microsoft.Extensions.Hosting.HostEnvironmentEnvExtensions.IsStaging%2A>.
+
+```csharp
+if (builder.Environment.IsStaging())
+{
+    builder.WebHost.UseStaticWebAssets();
+}
+```
 
 ## Static web asset base path
 
@@ -40,14 +56,14 @@ The `<StaticWebAssetBasePath>` property is most commonly used to control the pat
 
 Without setting the `<StaticWebAssetBasePath>` property, the client app of a hosted solution or a standalone app is published at the following paths:
 
-* In the **`Server`** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/`
+* In the **:::no-loc text="Server":::** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/`
 * In a standalone Blazor WebAssembly app: `/BlazorStandaloneSample/bin/Release/{TFM}/publish/wwwroot/`
 
 In the preceding examples, the `{TFM}` placeholder is the [Target Framework Moniker (TFM)](/dotnet/standard/frameworks) (for example, `net6.0`).
 
-If the `<StaticWebAssetBasePath>` property in the **`Client`** project of a hosted Blazor WebAssembly app or in a standalone Blazor WebAssembly app sets the published static asset path to `app1`, the root path to the app in published output is `/app1`.
+If the `<StaticWebAssetBasePath>` property in the **:::no-loc text="Client":::** project of a hosted Blazor WebAssembly app or in a standalone Blazor WebAssembly app sets the published static asset path to `app1`, the root path to the app in published output is `/app1`.
 
-In the **`Client`** app's project file (`.csproj`) or the standalone Blazor WebAssembly app's project file (`.csproj`):
+In the **:::no-loc text="Client":::** app's project file (`.csproj`) or the standalone Blazor WebAssembly app's project file (`.csproj`):
 
 ```xml
 <PropertyGroup>
@@ -57,7 +73,7 @@ In the **`Client`** app's project file (`.csproj`) or the standalone Blazor WebA
 
 In published output:
 
-* Path to the client app in the **`Server`** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/app1/`
+* Path to the client app in the **:::no-loc text="Server":::** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/app1/`
 * Path to a standalone Blazor WebAssembly app: `/BlazorStandaloneSample/bin/Release/{TFM}/publish/wwwroot/app1/`
 
 In the preceding examples, the `{TFM}` placeholder is the [Target Framework Moniker (TFM)](/dotnet/standard/frameworks) (for example, `net6.0`).
@@ -119,9 +135,33 @@ To create additional file mappings with a <xref:Microsoft.AspNetCore.StaticFiles
 
 ## Static File Middleware
 
-*This section applies to Blazor Server apps and the `**Server**` app of a hosted Blazor WebAssembly solution.*
+*This section applies to Blazor Server apps and the **:::no-loc text="Server":::** app of a hosted Blazor WebAssembly solution.*
 
 Configure Static File Middleware to serve static assets to clients by calling <xref:Microsoft.AspNetCore.Builder.StaticFileExtensions.UseStaticFiles%2A> in the app's request processing pipeline. For more information, see <xref:fundamentals/static-files>.
+
+## Static files in non-`Development` environments for Blazor Server apps
+
+*This section applies to Blazor Server apps.*
+
+In Blazor Server apps run locally, static web assets are only enabled by default in the <xref:Microsoft.Extensions.Hosting.Environments.Development> environment. To enable static files for environments other than <xref:Microsoft.Extensions.Hosting.Environments.Development> during local development and testing (for example, <xref:Microsoft.Extensions.Hosting.Environments.Staging>), call <xref:Microsoft.AspNetCore.Hosting.WebHostBuilderExtensions.UseStaticWebAssets%2A> on the <xref:Microsoft.AspNetCore.Hosting.IWebHostBuilder> in `Program.cs`.
+
+> [!WARNING]
+> Call <xref:Microsoft.AspNetCore.Hosting.WebHostBuilderExtensions.UseStaticWebAssets%2A> for the ***exact environment*** to prevent activating the feature in production, as it serves files from separate locations on disk *other than the project* if called in a production environment. The example in this section checks explicitly for the <xref:Microsoft.Extensions.Hosting.Environments.Staging> environment.
+
+
+```csharp
+Host.CreateDefaultBuilder(args)
+    .ConfigureWebHostDefaults(webBuilder =>
+    {
+        if (webBuilder.GetSetting(WebHostDefaults.EnvironmentKey) == 
+            Environments.Staging)
+        {
+            webBuilder.UseStaticWebAssets();
+        }
+
+        webBuilder.UseStartup<Startup>();
+    });
+```
 
 ## Static web asset base path
 
@@ -141,14 +181,14 @@ The `<StaticWebAssetBasePath>` property is most commonly used to control the pat
 
 Without setting the `<StaticWebAssetBasePath>` property, the client app of a hosted solution or a standalone app is published at the following paths:
 
-* In the **`Server`** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/`
+* In the **:::no-loc text="Server":::** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/`
 * In a standalone Blazor WebAssembly app: `/BlazorStandaloneSample/bin/Release/{TFM}/publish/wwwroot/`
 
 In the preceding examples, the `{TFM}` placeholder is the [Target Framework Moniker (TFM)](/dotnet/standard/frameworks) (for example, `net6.0`).
 
-If the `<StaticWebAssetBasePath>` property in the **`Client`** project of a hosted Blazor WebAssembly app or in a standalone Blazor WebAssembly app sets the published static asset path to `app1`, the root path to the app in published output is `/app1`.
+If the `<StaticWebAssetBasePath>` property in the **:::no-loc text="Client":::** project of a hosted Blazor WebAssembly app or in a standalone Blazor WebAssembly app sets the published static asset path to `app1`, the root path to the app in published output is `/app1`.
 
-In the **`Client`** app's project file (`.csproj`) or the standalone Blazor WebAssembly app's project file (`.csproj`):
+In the **:::no-loc text="Client":::** app's project file (`.csproj`) or the standalone Blazor WebAssembly app's project file (`.csproj`):
 
 ```xml
 <PropertyGroup>
@@ -158,7 +198,7 @@ In the **`Client`** app's project file (`.csproj`) or the standalone Blazor WebA
 
 In published output:
 
-* Path to the client app in the **`Server`** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/app1/`
+* Path to the client app in the **:::no-loc text="Server":::** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/app1/`
 * Path to a standalone Blazor WebAssembly app: `/BlazorStandaloneSample/bin/Release/{TFM}/publish/wwwroot/app1/`
 
 In the preceding examples, the `{TFM}` placeholder is the [Target Framework Moniker (TFM)](/dotnet/standard/frameworks) (for example, `net6.0`).
@@ -247,14 +287,14 @@ The `<StaticWebAssetBasePath>` property is most commonly used to control the pat
 
 Without setting the `<StaticWebAssetBasePath>` property, the client app of a hosted solution or a standalone app is published at the following paths:
 
-* In the **`Server`** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/`
+* In the **:::no-loc text="Server":::** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/`
 * In a standalone Blazor WebAssembly app: `/BlazorStandaloneSample/bin/Release/{TFM}/publish/wwwroot/`
 
 In the preceding examples, the `{TFM}` placeholder is the [Target Framework Moniker (TFM)](/dotnet/standard/frameworks) (for example, `net6.0`).
 
-If the `<StaticWebAssetBasePath>` property in the **`Client`** project of a hosted Blazor WebAssembly app or in a standalone Blazor WebAssembly app sets the published static asset path to `app1`, the root path to the app in published output is `/app1`.
+If the `<StaticWebAssetBasePath>` property in the **:::no-loc text="Client":::** project of a hosted Blazor WebAssembly app or in a standalone Blazor WebAssembly app sets the published static asset path to `app1`, the root path to the app in published output is `/app1`.
 
-In the **`Client`** app's project file (`.csproj`) or the standalone Blazor WebAssembly app's project file (`.csproj`):
+In the **:::no-loc text="Client":::** app's project file (`.csproj`) or the standalone Blazor WebAssembly app's project file (`.csproj`):
 
 ```xml
 <PropertyGroup>
@@ -264,7 +304,7 @@ In the **`Client`** app's project file (`.csproj`) or the standalone Blazor WebA
 
 In published output:
 
-* Path to the client app in the **`Server`** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/app1/`
+* Path to the client app in the **:::no-loc text="Server":::** project of a hosted Blazor WebAssembly solution: `/BlazorHostedSample/Server/bin/Release/{TFM}/publish/wwwroot/app1/`
 * Path to a standalone Blazor WebAssembly app: `/BlazorStandaloneSample/bin/Release/{TFM}/publish/wwwroot/app1/`
 
 In the preceding examples, the `{TFM}` placeholder is the [Target Framework Moniker (TFM)](/dotnet/standard/frameworks) (for example, `net6.0`).

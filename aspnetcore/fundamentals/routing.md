@@ -477,7 +477,7 @@ Regular expressions provide much more control over their matching behavior.
 
 <a name="greedy"></a>
 
-Greedy matching, also know as [lazy matching](https://wikipedia.org/wiki/Regular_expression#Lazy_matching), matches the largest possible string. Non-greedy matches the smallest possible string.
+Greedy matching, also known as [lazy matching](https://wikipedia.org/wiki/Regular_expression#Lazy_matching), matches the largest possible string. Non-greedy matches the smallest possible string.
 
 ## Route constraints
 
@@ -570,7 +570,7 @@ Custom route constraints can be created by implementing the <xref:Microsoft.AspN
 
 Custom route constraints are rarely needed. Before implementing a custom route constraint, consider alternatives, such as model binding.
 
-The ASP.NET Core [Constraints](https://github.com/dotnet/aspnetcore/tree/main/src/Http/Routing/src/Constraints) folder provides good examples of creating a constraints. For example, [GuidRouteConstraint](https://github.com/dotnet/aspnetcore/blob/main/src/Http/Routing/src/Constraints/GuidRouteConstraint.cs#L18).
+The ASP.NET Core [Constraints](https://github.com/dotnet/aspnetcore/tree/main/src/Http/Routing/src/Constraints) folder provides good examples of creating constraints. For example, [GuidRouteConstraint](https://github.com/dotnet/aspnetcore/blob/main/src/Http/Routing/src/Constraints/GuidRouteConstraint.cs#L18).
 
 To use a custom `IRouteConstraint`, the route constraint type must be registered with the app's <xref:Microsoft.AspNetCore.Routing.RouteOptions.ConstraintMap> in the service container. A `ConstraintMap` is a dictionary that maps route constraint keys to `IRouteConstraint` implementations that validate those constraints. An app's `ConstraintMap` can be updated in `Program.cs` either as part of an <xref:Microsoft.Extensions.DependencyInjection.RoutingServiceCollectionExtensions.AddRouting%2A> call or by configuring <xref:Microsoft.AspNetCore.Routing.RouteOptions> directly with `builder.Services.Configure<RouteOptions>`. For example:
 
@@ -855,6 +855,16 @@ When the `[Host]` attribute is applied to both the controller and action method:
 * The attribute on the action is used.
 * The controller attribute is ignored.
 
+:::moniker-end
+:::moniker range=">= aspnetcore-7.0"
+
+## Route groups
+
+[!INCLUDE[](~/includes/route-groups.md)]
+
+:::moniker-end
+:::moniker range=">= aspnetcore-6.0"
+
 ## Performance guidance for routing
 
 When an app has performance problems, routing is often suspected as the problem. The reason routing is suspected is that frameworks like controllers and Razor Pages report the amount of time spent inside the framework in their logging messages. When there's a significant difference between the time reported by controllers and the total time of the request:
@@ -899,7 +909,7 @@ By default ASP.NET Core uses a routing algorithm that trades memory for CPU time
 It is unlikely for an app to run into a situation where this is a problem unless:
 
 * There are a high number of routes in the app using this pattern.
-* There is a large number of routes in in the app.
+* There is a large number of routes in the app.
 
 #### How to determine if an app is running into the large route table problem
 
@@ -955,6 +965,14 @@ app.MapHealthChecks("/healthz");
 **CONSIDER** writing your own <xref:Microsoft.AspNetCore.Routing.EndpointDataSource>. `EndpointDataSource` is the low-level primitive for declaring and updating a collection of endpoints. `EndpointDataSource` is a powerful API used by controllers and Razor Pages.
 
 The routing tests have a [basic example](https://github.com/dotnet/AspNetCore/blob/main/src/Http/Routing/test/testassets/RoutingSandbox/Framework/FrameworkEndpointDataSource.cs#L17) of a non-updating data source.
+
+:::moniker-end
+:::moniker range=">= aspnetcore-7.0"
+
+**CONSIDER** implementing <xref:Microsoft.AspNetCore.Routing.EndpointDataSource.GetGroupedEndpoints%2A>. This gives complete control over running group conventions and the final metadata on the grouped endpoints. For example, this allows custom `EndpointDataSource` implementations to run [endpoint filters](xref:fundamentals/minimal-apis/min-api-filters) added to groups.
+
+:::moniker-end
+:::moniker range=">= aspnetcore-6.0"
 
 **DO NOT** attempt to register an `EndpointDataSource` by default. Require users to register your framework in <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseEndpoints%2A>. The philosophy of routing is that nothing is included by default, and that `UseEndpoints` is the place to register endpoints.
 
@@ -1476,7 +1494,7 @@ Regular expressions provide much more control over their matching behavior.
 
 <a name="greedy"></a>
 
-Greedy matching, also know as [lazy matching](https://wikipedia.org/wiki/Regular_expression#Lazy_matching), matches the largest possible string. Non-greedy matches the smallest possible string.
+Greedy matching, also known as [lazy matching](https://wikipedia.org/wiki/Regular_expression#Lazy_matching), matches the largest possible string. Non-greedy matches the smallest possible string.
 
 ## Route constraint reference
 
@@ -1569,7 +1587,7 @@ Custom route constraints can be created by implementing the <xref:Microsoft.AspN
 
 Custom route constraints are rarely needed. Before implementing a custom route constraint, consider alternatives, such as model binding.
 
-The ASP.NET Core [Constraints](https://github.com/dotnet/aspnetcore/tree/main/src/Http/Routing/src/Constraints) folder provides good examples of creating a constraints. For example, [GuidRouteConstraint](https://github.com/dotnet/aspnetcore/blob/main/src/Http/Routing/src/Constraints/GuidRouteConstraint.cs#L18).
+The ASP.NET Core [Constraints](https://github.com/dotnet/aspnetcore/tree/main/src/Http/Routing/src/Constraints) folder provides good examples of creating constraints. For example, [GuidRouteConstraint](https://github.com/dotnet/aspnetcore/blob/main/src/Http/Routing/src/Constraints/GuidRouteConstraint.cs#L18).
 
 To use a custom `IRouteConstraint`, the route constraint type must be registered with the app's <xref:Microsoft.AspNetCore.Routing.RouteOptions.ConstraintMap> in the service container. A `ConstraintMap` is a dictionary that maps route constraint keys to `IRouteConstraint` implementations that validate those constraints. An app's `ConstraintMap` can be updated in `Startup.ConfigureServices` either as part of a [services.AddRouting](xref:Microsoft.Extensions.DependencyInjection.RoutingServiceCollectionExtensions.AddRouting%2A) call or by configuring <xref:Microsoft.AspNetCore.Routing.RouteOptions> directly with `services.Configure<RouteOptions>`. For example:
 

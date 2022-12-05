@@ -129,6 +129,8 @@ Override the `OnDisconnectedAsync` virtual method to perform actions when a clie
 
 :::code language="csharp" source="~/../AspNetCore.Docs.Samples/signalr/hubs/samples/6.x/SignalRHubsSample/Snippets/Hubs/ChatHub.cs" id="snippet_OnDisconnectedAsync":::
 
+<xref:Microsoft.AspNetCore.SignalR.IGroupManager.RemoveFromGroupAsync%2A> does not need to be called in <xref:Microsoft.AspNetCore.SignalR.Hub.OnDisconnectedAsync%2A>, it's automatically handled for you.
+
 ## Handle errors
 
 Exceptions thrown in hub methods are sent to the client that invoked the method. On the JavaScript client, the `invoke` method returns a [JavaScript `Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Guide/Using_promises). Clients can attach a `catch` handler to the returned promise or use `try`/`catch` with `async`/`await` to handle exceptions:
@@ -305,6 +307,8 @@ Override the `OnDisconnectedAsync` virtual method to perform actions when a clie
 
 :::code language="csharp" source="hubs/samples/2.x/SignalRChat/Hubs/ChatHub.cs" id="OnDisconnectedAsync":::
 
+<xref:Microsoft.AspNetCore.SignalR.IGroupManager.RemoveFromGroupAsync%2A> does not need to be called in <xref:Microsoft.AspNetCore.SignalR.Hub.OnDisconnectedAsync%2A>, it's automatically handled for you.
+
 [!INCLUDE[](~/includes/connectionid-signalr.md)]
 
 ## Handle errors
@@ -476,6 +480,8 @@ Override the `OnDisconnectedAsync` virtual method to perform actions when a clie
 
 :::code language="csharp" source="hubs/samples/2.x/SignalRChat/Hubs/ChatHub.cs" id="OnDisconnectedAsync":::
 
+<xref:Microsoft.AspNetCore.SignalR.IGroupManager.RemoveFromGroupAsync%2A> does not need to be called in <xref:Microsoft.AspNetCore.SignalR.Hub.OnDisconnectedAsync%2A>, it's automatically handled for you.
+
 [!INCLUDE[](~/includes/connectionid-signalr.md)]
 
 ## Handle errors
@@ -576,13 +582,12 @@ The <xref:Microsoft.AspNetCore.SignalR.Hub> class includes a <xref:Microsoft.Asp
 | <xref:Microsoft.AspNetCore.SignalR.IHubClients%601.GroupExcept%2A> | Calls a method on all connections in the specified group, except the specified connections |
 | <xref:Microsoft.AspNetCore.SignalR.IHubClients%601.Groups%2A> | Calls a method on multiple groups of connections |
 | <xref:Microsoft.AspNetCore.SignalR.IHubCallerClients%601.OthersInGroup%2A> | Calls a method on a group of connections, excluding the client that invoked the hub method |
-| `Single` | Calls a method on a specific connected client |
 | <xref:Microsoft.AspNetCore.SignalR.IHubClients%601.User%2A> | Calls a method on all connections associated with a specific user |
 | <xref:Microsoft.AspNetCore.SignalR.IHubClients%601.Users%2A> | Calls a method on all connections associated with the specified users |
 
 Each property or method in the preceding tables returns an object with a `SendAsync` method. The `SendAsync` method receives the name of the client method to call and any parameters.
 
-The object returned by the `Single` method also contains an `InvokeAsync` method, which can be used to wait for a [result from the client](xref:signalr/hubs#client-results).
+The object returned by the `Client` and `Caller` methods also contain an `InvokeAsync` method, which can be used to wait for a [result from the client](xref:signalr/hubs#client-results).
 
 ## Send messages to clients
 
@@ -615,14 +620,14 @@ Using `Hub<IChatClient>` enables compile-time checking of the client methods. Th
 
 In addition to making calls to clients, the server can request a result from a client. This requires the server to use `ISingleClientProxy.InvokeAsync` and the client to return a result from its `.On` handler.
 
-There are two ways to use the API on the server, the first is to call `Single(...)` on the `Clients` property in a Hub method:
+There are two ways to use the API on the server, the first is to call `Client(...)` or `Caller` on the `Clients` property in a Hub method:
 
 ```csharp
 public class ChatHub : Hub
 {
     public async Task<string> WaitForMessage(string connectionId)
     {
-        var message = await Clients.Single(connectionId).InvokeAsync<string>(
+        var message = await Clients.Client(connectionId).InvokeAsync<string>(
             "GetMessage");
         return message;
     }
@@ -634,12 +639,12 @@ public class ChatHub : Hub
 >
 > This will be addressed in a future release. For more information, see [Support returning values from client invocations](https://github.com/dotnet/aspnetcore/issues/5280).
 
-The second way is to call `Single(...)` on an instance of [`IHubContext<T>`](xref:signalr/hubcontext):
+The second way is to call `Client(...)` on an instance of [`IHubContext<T>`](xref:signalr/hubcontext):
 
 ```csharp
 async Task SomeMethod(IHubContext<MyHub> context)
 {
-    string result = await context.Clients.Single(connectionID).InvokeAsync<string>(
+    string result = await context.Clients.Client(connectionID).InvokeAsync<string>(
         "GetMessage");
 }
 ```
@@ -656,7 +661,7 @@ public class ChatHub : Hub<IClient>
 {
     public async Task<string> WaitForMessage(string connectionId)
     {
-        string message = await Clients.Single(connectionId).GetMessage();
+        string message = await Clients.Client(connectionId).GetMessage();
         return message;
     }
 }
@@ -688,11 +693,6 @@ hubConnection.on("GetMessage", async () => {
 });
 ```
 
-> [!NOTE]
-> Client results don't work with the Azure SignalR Service.
->
-> This will be addressed in a future release. For more information, see [Support returning values from client invocations](https://github.com/dotnet/aspnetcore/issues/5280).
-
 ## Change the name of a hub method
 
 By default, a server hub method name is the name of the .NET method. To change this default behavior for a specific method, use the [HubMethodName](xref:Microsoft.AspNetCore.SignalR.HubMethodNameAttribute) attribute. The client should use this name instead of the .NET method name when invoking the method:
@@ -722,7 +722,7 @@ public class ChatHub : Hub
 ```
 
 If implicit resolution of parameters from services isn't desired, disable it with [DisableImplicitFromServicesParameters](xref:signalr/configuration#configure-server-options).
-To explicitly specify which parameters are resolved from DI in your hub methods, you can use the `DisableImplicitFromServicesParameters` option and use the `[FromServices]` attribute or a custom attribute that implements `IFromServiceMetadata` on your parameters.
+To explicitly specify which parameters are resolved from DI in hub methods, use the [`DisableImplicitFromServicesParameters`](/dotnet/api/microsoft.aspnetcore.signalr.huboptions.disableimplicitfromservicesparameters) option and use the `[FromServices]` attribute or a custom attribute that implements `IFromServiceMetadata` on the hub method parameters that should be resolved from DI.
 
 ```csharp
 services.AddSingleton<IDatabaseService, DatabaseServiceImpl>();
@@ -757,6 +757,7 @@ Override the `OnDisconnectedAsync` virtual method to perform actions when a clie
 
 :::code language="csharp" source="~/../AspNetCore.Docs.Samples/signalr/hubs/samples/6.x/SignalRHubsSample/Snippets/Hubs/ChatHub.cs" id="snippet_OnDisconnectedAsync":::
 
+<xref:Microsoft.AspNetCore.SignalR.IGroupManager.RemoveFromGroupAsync%2A> does not need to be called in <xref:Microsoft.AspNetCore.SignalR.Hub.OnDisconnectedAsync%2A>, it's automatically handled for you.
 ## Handle errors
 
 Exceptions thrown in hub methods are sent to the client that invoked the method. On the JavaScript client, the `invoke` method returns a [JavaScript `Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Guide/Using_promises). Clients can attach a `catch` handler to the returned promise or use `try`/`catch` with `async`/`await` to handle exceptions:

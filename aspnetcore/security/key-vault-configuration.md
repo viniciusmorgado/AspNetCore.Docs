@@ -110,7 +110,7 @@ Configure Azure AD, Azure Key Vault, and the app to use an Azure AD Application 
 
 The sample app uses an Application ID and X.509 certificate when the `#define` preprocessor directive at the top of `Program.cs` is set to `Certificate`.
 
-1. Create a PKCS#12 archive (*.pfx*) certificate. Options for creating certificates include [MakeCert on Windows](/windows/desktop/seccrypto/makecert) and [OpenSSL](https://www.openssl.org/).
+1. Create a PKCS#12 archive (*.pfx*) certificate. Options for creating certificates include [New-SelfSignedCertificate on Windows](/powershell/module/pki/new-selfsignedcertificate) and [OpenSSL](https://www.openssl.org/).
 1. Install the certificate into the current user's personal certificate store. Marking the key as exportable is optional. Note the certificate's thumbprint, which is used later in this process.
 1. Export the PKCS#12 archive (*.pfx*) certificate as a DER-encoded certificate (*.cer*).
 1. Register the app with Azure AD (**App registrations**).
@@ -199,7 +199,7 @@ For information on using the provider with a managed identity and Azure Pipeline
 
 ## Configuration options
 
-`AddAzureKeyVault` can accept an <xref:Microsoft.Extensions.Configuration.AzureKeyVault.AzureKeyVaultConfigurationOptions> object:
+`AddAzureKeyVault` can accept an <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions> object:
 
 :::code language="csharp" source="key-vault-configuration/samples/6.x/KeyVaultConfigurationSample/Snippets/Program.cs" id="snippet_AddAzureKeyVaultConfigurationOptions":::
 
@@ -207,12 +207,12 @@ The `AzureKeyVaultConfigurationOptions` object contains the following properties
 
 | Property                                                                                                    | Description                                                                                                                           |
 |-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| <xref:Microsoft.Extensions.Configuration.AzureKeyVault.AzureKeyVaultConfigurationOptions.Manager%2A>        | <xref:Microsoft.Extensions.Configuration.AzureKeyVault.IKeyVaultSecretManager> instance used to control secret loading.               |
-| <xref:Microsoft.Extensions.Configuration.AzureKeyVault.AzureKeyVaultConfigurationOptions.ReloadInterval%2A> | `TimeSpan` to wait between attempts at polling the key vault for changes. The default value is `null` (configuration isn't reloaded). |
+| <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions.Manager%2A>        | <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.KeyVaultSecretManager> instance used to control secret loading.               |
+| <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions.ReloadInterval%2A> | `TimeSpan` to wait between attempts at polling the key vault for changes. The default value is `null` (configuration isn't reloaded). |
 
 ## Use a key name prefix
 
-`AddAzureKeyVault` provides an overload that accepts an implementation of <xref:Microsoft.Extensions.Configuration.AzureKeyVault.IKeyVaultSecretManager>, which allows you to control how key vault secrets are converted into configuration keys. For example, you can implement the interface to load secret values based on a prefix value you provide at app startup. This technique allows you, for example, to load secrets based on the version of the app.
+`AddAzureKeyVault` provides an overload that accepts an implementation of <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.KeyVaultSecretManager>, which allows you to control how key vault secrets are converted into configuration keys. For example, you can implement the interface to load secret values based on a prefix value you provide at app startup. This technique allows you, for example, to load secrets based on the version of the app.
 
 > [!WARNING]
 > Don't use prefixes on key vault secrets to:
@@ -224,7 +224,7 @@ The `AzureKeyVaultConfigurationOptions` object contains the following properties
 
 In the following example, a secret is established in the key vault (and using Secret Manager for the Development environment) for `5000-AppSecret` (periods aren't allowed in key vault secret names). This secret represents an app secret for version 5.0.0.0 of the app. For another version of the app, 5.1.0.0, a secret is added to the key vault (and using Secret Manager) for `5100-AppSecret`. Each app version loads its versioned secret value into its configuration as `AppSecret`, removing the version as it loads the secret.
 
-`AddAzureKeyVault` is called with a custom `IKeyVaultSecretManager` implementation:
+`AddAzureKeyVault` is called with a custom `KeyVaultSecretManager` implementation:
 
 :::code language="csharp" source="key-vault-configuration/samples/6.x/KeyVaultConfigurationSample/Snippets/Program.cs" id="snippet_AddAzureKeyVaultSecretManager":::
 
@@ -332,11 +332,33 @@ To reload secrets, call <xref:Microsoft.Extensions.Configuration.IConfigurationR
 config.Reload();
 ```
 
-To reload secrets periodically, at a specified interval, set the <xref:Microsoft.Extensions.Configuration.AzureKeyVault.AzureKeyVaultConfigurationOptions.ReloadInterval%2A?displayProperty=nameWithType> property. For more information, see [Configuration options](#configuration-options).
+To reload secrets periodically, at a specified interval, set the <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions.ReloadInterval%2A?displayProperty=nameWithType> property. For more information, see [Configuration options](#configuration-options).
 
 ## Disabled and expired secrets
 
-Disabled and expired secrets are excluded from the configuration provider. To include values for these secrets in app configuration, provide the configuration using a different configuration provider or update the disabled or expired secret.
+Disabled and expired secrets are included by default in the configuration provider. To exclude values for these secrets in app configuration, update the disabled or expired secret or provide the configuration using a custom configuration provider:
+
+```csharp
+class SampleKeyVaultSecretManager : KeyVaultSecretManager
+{
+  public override bool Load(SecretProperties properties) =>
+    properties.Enabled.HasValue &&
+    properties.Enabled.Value &&
+    properties.ExpiresOn.HasValue &&
+    properties.ExpiresOn.Value > DateTimeOffset.Now;
+}
+```
+
+Pass this custom `KeyVaultSecretManager` to `AddAzureKeyVault`:
+
+```csharp
+// using Azure.Extensions.AspNetCore.Configuration.Secrets;
+
+builder.Configuration.AddAzureKeyVault(
+    new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
+    new DefaultAzureCredential(),
+    new SampleKeyVaultSecretManager());
+```
 
 ## Troubleshoot
 
@@ -460,7 +482,7 @@ Configure Azure AD, Azure Key Vault, and the app to use an Azure AD Application 
 
 The sample app uses an Application ID and X.509 certificate when the `#define` preprocessor directive at the top of `Program.cs` is set to `Certificate`.
 
-1. Create a PKCS#12 archive (*.pfx*) certificate. Options for creating certificates include [MakeCert on Windows](/windows/desktop/seccrypto/makecert) and [OpenSSL](https://www.openssl.org/).
+1. Create a PKCS#12 archive (*.pfx*) certificate. Options for creating certificates include [New-SelfSignedCertificate on Windows](/powershell/module/pki/new-selfsignedcertificate) and [OpenSSL](https://www.openssl.org/).
 1. Install the certificate into the current user's personal certificate store. Marking the key as exportable is optional. Note the certificate's thumbprint, which is used later in this process.
 1. Export the PKCS#12 archive (*.pfx*) certificate as a DER-encoded certificate (*.cer*).
 1. Register the app with Azure AD (**App registrations**).
@@ -548,7 +570,7 @@ For information on using the provider with a managed identity and Azure Pipeline
 
 ## Configuration options
 
-`AddAzureKeyVault` can accept an <xref:Microsoft.Extensions.Configuration.AzureKeyVault.AzureKeyVaultConfigurationOptions> object:
+`AddAzureKeyVault` can accept an <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions> object:
 
 ```csharp
 config.AddAzureKeyVault(
@@ -565,12 +587,12 @@ The `AzureKeyVaultConfigurationOptions` object contains the following properties
 
 | Property                                                                                                    | Description                                                                                                                           |
 |-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| <xref:Microsoft.Extensions.Configuration.AzureKeyVault.AzureKeyVaultConfigurationOptions.Manager%2A>        | <xref:Microsoft.Extensions.Configuration.AzureKeyVault.IKeyVaultSecretManager> instance used to control secret loading.               |
-| <xref:Microsoft.Extensions.Configuration.AzureKeyVault.AzureKeyVaultConfigurationOptions.ReloadInterval%2A> | `TimeSpan` to wait between attempts at polling the key vault for changes. The default value is `null` (configuration isn't reloaded). |
+| <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions.Manager%2A>        | <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.KeyVaultSecretManager> instance used to control secret loading.               |
+| <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions.ReloadInterval%2A> | `TimeSpan` to wait between attempts at polling the key vault for changes. The default value is `null` (configuration isn't reloaded). |
 
 ## Use a key name prefix
 
-`AddAzureKeyVault` provides an overload that accepts an implementation of <xref:Microsoft.Extensions.Configuration.AzureKeyVault.IKeyVaultSecretManager>, which allows you to control how key vault secrets are converted into configuration keys. For example, you can implement the interface to load secret values based on a prefix value you provide at app startup. This technique allows you, for example, to load secrets based on the version of the app.
+`AddAzureKeyVault` provides an overload that accepts an implementation of <xref:Azure.Extensions.AspNetCore.Configuration.Secrets.KeyVaultSecretManager>, which allows you to control how key vault secrets are converted into configuration keys. For example, you can implement the interface to load secret values based on a prefix value you provide at app startup. This technique allows you, for example, to load secrets based on the version of the app.
 
 > [!WARNING]
 > Don't use prefixes on key vault secrets to:
@@ -582,7 +604,7 @@ The `AzureKeyVaultConfigurationOptions` object contains the following properties
 
 In the following example, a secret is established in the key vault (and using Secret Manager for the Development environment) for `5000-AppSecret` (periods aren't allowed in key vault secret names). This secret represents an app secret for version 5.0.0.0 of the app. For another version of the app, 5.1.0.0, a secret is added to the key vault (and using Secret Manager) for `5100-AppSecret`. Each app version loads its versioned secret value into its configuration as `AppSecret`, removing the version as it loads the secret.
 
-`AddAzureKeyVault` is called with a custom `IKeyVaultSecretManager` implementation:
+`AddAzureKeyVault` is called with a custom `KeyVaultSecretManager` implementation:
 
 :::code language="csharp" source="key-vault-configuration/samples_snapshot/3.x/Program.cs":::
 

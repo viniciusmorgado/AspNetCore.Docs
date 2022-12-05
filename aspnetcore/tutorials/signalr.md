@@ -2,7 +2,8 @@
 title: Get started with ASP.NET Core SignalR
 author: bradygaster
 description: In this tutorial, you create a chat app that uses ASP.NET Core SignalR.
-ms.author: bradyg
+<!-- ms.author: bradyg -->
+ms.author: wpickett
 monikerRange: '>= aspnetcore-3.1'
 ms.custom: mvc
 ms.date: 11/21/2021
@@ -132,7 +133,7 @@ The SignalR server library is included in the ASP.NET Core shared framework. The
   * Run the following command to get the SignalR client library by using LibMan. You might have to wait a few seconds before seeing output.
 
   ```console
-  libman install @microsoft/signalr@latest -p unpkg -d wwwroot/js/signalr --files dist/browser/signalr.js --files dist/browser/signalr.min.js
+  libman install @microsoft/signalr@latest -p unpkg -d wwwroot/js/signalr --files dist/browser/signalr.js --files dist/browser/signalr.js
   ```
 
   The parameters specify the following options:
@@ -144,7 +145,7 @@ The SignalR server library is included in the ASP.NET Core shared framework. The
 
   ```console
   wwwroot/js/signalr/dist/browser/signalr.js written to disk
-  wwwroot/js/signalr/dist/browser/signalr.min.js written to disk
+  wwwroot/js/signalr/dist/browser/signalr.js written to disk
   Installed library "@microsoft/signalr@latest" to "wwwroot/js/signalr"
   ```
 
@@ -161,7 +162,7 @@ The SignalR server library is included in the ASP.NET Core shared framework. The
   * Run the following command to get the SignalR client library by using LibMan.
 
   ```console
-  libman install @microsoft/signalr@latest -p unpkg -d wwwroot/js/signalr --files dist/browser/signalr.js --files dist/browser/signalr.min.js
+  libman install @microsoft/signalr@latest -p unpkg -d wwwroot/js/signalr --files dist/browser/signalr.js --files dist/browser/signalr.js
   ```
 
   The parameters specify the following options:
@@ -173,7 +174,7 @@ The SignalR server library is included in the ASP.NET Core shared framework. The
 
   ```console
   wwwroot/js/signalr/dist/browser/signalr.js written to disk
-  wwwroot/js/signalr/dist/browser/signalr.min.js written to disk
+  wwwroot/js/signalr/dist/browser/signalr.js written to disk
   Installed library "@microsoft/signalr@latest" to "wwwroot/js/signalr"
   ```
 
@@ -355,7 +356,7 @@ The SignalR server library is included in the ASP.NET Core 3.1 shared framework.
   * Run the following command to get the SignalR client library by using LibMan. You might have to wait a few seconds before seeing output.
 
   ```console
-  libman install @microsoft/signalr@latest -p unpkg -d wwwroot/js/signalr --files dist/browser/signalr.js --files dist/browser/signalr.min.js
+  libman install @microsoft/signalr@latest -p unpkg -d wwwroot/js/signalr --files dist/browser/signalr.js --files dist/browser/signalr.js
   ```
 
   The parameters specify the following options:
@@ -367,7 +368,7 @@ The SignalR server library is included in the ASP.NET Core 3.1 shared framework.
 
   ```console
   wwwroot/js/signalr/dist/browser/signalr.js written to disk
-  wwwroot/js/signalr/dist/browser/signalr.min.js written to disk
+  wwwroot/js/signalr/dist/browser/signalr.js written to disk
   Installed library "@microsoft/signalr@latest" to "wwwroot/js/signalr"
   ```
 
@@ -385,7 +386,7 @@ The SignalR server library is included in the ASP.NET Core 3.1 shared framework.
   * Run the following command to get the SignalR client library by using LibMan.
 
   ```console
-  libman install @microsoft/signalr@latest -p unpkg -d wwwroot/js/signalr --files dist/browser/signalr.js --files dist/browser/signalr.min.js
+  libman install @microsoft/signalr@latest -p unpkg -d wwwroot/js/signalr --files dist/browser/signalr.js --files dist/browser/signalr.js
   ```
 
   The parameters specify the following options:
@@ -397,7 +398,7 @@ The SignalR server library is included in the ASP.NET Core 3.1 shared framework.
 
   ```console
   wwwroot/js/signalr/dist/browser/signalr.js written to disk
-  wwwroot/js/signalr/dist/browser/signalr.min.js written to disk
+  wwwroot/js/signalr/dist/browser/signalr.js written to disk
   Installed library "@microsoft/signalr@latest" to "wwwroot/js/signalr"
   ```
 

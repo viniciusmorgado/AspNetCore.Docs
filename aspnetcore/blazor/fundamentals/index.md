@@ -5,7 +5,7 @@ description: Learn foundational concepts of the Blazor application framework.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 02/08/2022
+ms.date: 11/08/2022
 uid: blazor/fundamentals/index
 ---
 # ASP.NET Core Blazor fundamentals
@@ -14,9 +14,7 @@ uid: blazor/fundamentals/index
 
 ## Razor components
 
-Blazor apps are based on *Razor components*, often referred to as just *components*. Components are covered in detail in the *Components* articles, but it's important to learn component basics and note conventions used in the articles before reading *Fundamentals* articles, which use components to demonstrate concepts.
-
-A *component* is an element of UI, such as a page, dialog, or data entry form. Components are .NET C# classes built into [.NET assemblies](/dotnet/standard/assembly/).
+Blazor apps are based on *Razor components*, often referred to as just *components*. A *component* is an element of UI, such as a page, dialog, or data entry form. Components are .NET C# classes built into [.NET assemblies](/dotnet/standard/assembly/).
 
 *Razor* refers to how components are usually written in the form of a [Razor](xref:mvc/views/razor) markup page for client-side UI logic and composition. Razor is a syntax for combining HTML markup with C# code designed for developer productivity. Razor files use the `.razor` file extension.
 
@@ -68,9 +66,38 @@ The preceding `Counter` component:
 
 ## Sample apps
 
-Documentation sample apps are available for inspection or download:
+Documentation sample apps are available for inspection and download:
 
-[`dotnet/blazor-samples` GitHub repository](https://github.com/dotnet/blazor-samples)
+[Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples)
+
+The repo contains two types of samples:
+
+* Snippet sample apps for Blazor Server and Blazor WebAssembly provide the code examples that appear in Blazor articles. These apps don't compile and aren't runnable apps. They're provided solely for the purpose of obtaining article example code.
+* Samples apps to accompany Blazor articles compile and run for the following scenarios:
+  * Blazor Server with EF Core
+  * Blazor Server and Blazor WebAssembly with SignalR
+  * Blazor WebAssembly scopes-enabled logging
+
+> [!NOTE]
+> Not all of the preceding sample apps are available for all releases of ASP.NET Core.
+
+For more information, see the [Blazor samples GitHub repository README.md file](https://github.com/dotnet/blazor-samples).
+
+The ASP.NET Core repository's Basic Test App is also a helpful set of samples for various Blazor scenarios:
+
+[`BasicTestApp` in ASP.NET Core reference source (`dotnet/aspnetcore`)](https://github.com/dotnet/aspnetcore/tree/main/src/Components/test/testassets/BasicTestApp)
+
+[!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
+
+## Byte multiples
+
+.NET byte sizes use metric prefixes for non-decimal multiples of bytes based on powers of 1024.
+
+| Name (abbreviation) | Size                    | Example                    |
+| ------------------- | ----------------------- | -------------------------- |
+| Kilobyte (KB)       | 1,024 bytes             | 1 KB = 1,024 bytes         |
+| Megabyte (MB)       | 1,024<sup>2</sup> bytes | 1 MB = 1,048,576 bytes     |
+| Gigabyte (GB)       | 1,024<sup>3</sup> bytes | 1 GB = 1,073,741,824 bytes |
 
 ## Support requests
 

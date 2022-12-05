@@ -13,7 +13,59 @@ By [Rick Anderson](https://twitter.com/RickAndMSFT)
 
 ASP.NET Core provides APIs and templates to help meet some of the [EU General Data Protection Regulation (GDPR)](https://ec.europa.eu/info/law/law-topic/data-protection/reform/what-does-general-data-protection-regulation-gdpr-govern_en) requirements:
 
-:::moniker range=">= aspnetcore-3.0"
+:::moniker range=">= aspnetcore-7.0"
+
+* The project templates include extension points and stubbed markup that you can replace with your privacy and cookie use policy.
+* The `Pages/Privacy.cshtml` page or `Views/Home/Privacy.cshtml` view provides a page to detail your site's privacy policy.
+
+To enable the default cookie consent feature like that found in the ASP.NET Core 2.2 templates in a current ASP.NET Core template generated app, add the following highlighted code to `Program.cs`:
+
+  [!code-csharp[Main](~/security/gdpr/sample/RP6.0/WebGDPR/Program.cs?name=snippet_1&highlight=4-11,23)]
+
+In the preceding code, <xref:Microsoft.AspNetCore.Builder.CookiePolicyOptions> and <xref:Microsoft.AspNetCore.Builder.CookiePolicyAppBuilderExtensions.UseCookiePolicy%2A> are used.
+
+* Add the cookie consent partial to the `_Layout.cshtml` file:
+
+  [!code-cshtml[Main](~/security/gdpr/sample/RP6.0/WebGDPR/Pages/Shared/_Layout.cshtml?name=snippet&highlight=4)]
+
+* Add the `_CookieConsentPartial.cshtml` file to the project:
+
+  [!code-cshtml[Main](~/security/gdpr/sample/RP6.0/WebGDPR/Pages/Shared/_CookieConsentPartial.cshtml)]
+
+* Select the ASP.NET Core [2.2 version](xref:security/gdpr?view=aspnetcore-2.2&preserve-view=true) of this article to read about the cookie consent feature.
+
+## Customize the cookie consent value
+
+Specify the value used to track if the user consented to the cookie use policy using the [`CookiePolicyOptions.ConsentCookieValue`](/dotnet/api/microsoft.aspnetcore.builder.cookiepolicyoptions.consentcookievalue) property:
+
+[!code-csharp[Main](~/security/gdpr/sample/RP6.0/WebGDPR/Program.cs?name=snippet_2&highlight=8)]
+
+:::moniker-end
+
+:::moniker range="= aspnetcore-6.0"
+
+* The project templates include extension points and stubbed markup that you can replace with your privacy and cookie use policy.
+* The `Pages/Privacy.cshtml` page or `Views/Home/Privacy.cshtml` view provides a page to detail your site's privacy policy.
+
+To enable the default cookie consent feature like that found in the ASP.NET Core 2.2 templates in a current ASP.NET Core template generated app, add the following highlighted code to `Program.cs`:
+
+  [!code-csharp[Main](~/security/gdpr/sample/RP6.0/WebGDPR/Program.cs?name=snippet_1&highlight=4-11,23)]
+
+In the preceding code, <xref:Microsoft.AspNetCore.Builder.CookiePolicyOptions> and <xref:Microsoft.AspNetCore.Builder.CookiePolicyAppBuilderExtensions.UseCookiePolicy%2A> are used.
+
+* Add the cookie consent partial to the `_Layout.cshtml` file:
+
+  [!code-cshtml[Main](~/security/gdpr/sample/RP6.0/WebGDPR/Pages/Shared/_Layout.cshtml?name=snippet&highlight=4)]
+
+* Add the `_CookieConsentPartial.cshtml` file to the project:
+
+  [!code-cshtml[Main](~/security/gdpr/sample/RP6.0/WebGDPR/Pages/Shared/_CookieConsentPartial.cshtml)]
+
+* Select the ASP.NET Core [2.2 version](xref:security/gdpr?view=aspnetcore-2.2&preserve-view=true) of this article to read about the cookie consent feature.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-3.0 < aspnetcore-6.0"
 
 * The project templates include extension points and stubbed markup that you can replace with your privacy and cookie use policy.
 * The `Pages/Privacy.cshtml` page or `Views/Home/Privacy.cshtml` view provides a page to detail your site's privacy policy.
@@ -45,7 +97,7 @@ To enable the default cookie consent feature like that found in the ASP.NET Core
 * [TempData and Session cookies](#tempdata) aren't functional when tracking is disabled.
 * The [Identity manage](#pd) page provides a link to download and delete user data.
 
-The [sample app](https://github.com/dotnet/AspNetCore.Docs/tree/live/aspnetcore/security/gdpr/sample) allows you test most of the GDPR extension points and APIs added to the ASP.NET Core 2.1 templates. See the [ReadMe](https://github.com/dotnet/AspNetCore.Docs/tree/live/aspnetcore/security/gdpr/sample) file for testing instructions.
+The [sample app](https://github.com/dotnet/AspNetCore.Docs/tree/live/aspnetcore/security/gdpr/sample) allows you to test most of the GDPR extension points and APIs added to the ASP.NET Core 2.1 templates. See the [ReadMe](https://github.com/dotnet/AspNetCore.Docs/tree/live/aspnetcore/security/gdpr/sample) file for testing instructions.
 
 [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/live/aspnetcore/security/gdpr/sample) ([how to download](xref:index#how-to-download-a-sample))
 
@@ -142,4 +194,3 @@ For databases that don't provide built-in encryption at rest, you may be able to
 ## Additional resources
 
 * [Microsoft.com/GDPR](https://www.microsoft.com/trustcenter/Privacy/GDPR)
-* [GDPR - Adding a Revoke Consent Button in ASP.NET Core](https://www.joeaudette.com/blog/2018/08/28/gdpr---adding-a-revoke-consent-button-in-aspnet-core)

@@ -176,11 +176,11 @@ gRPC server interceptors intercept incoming RPC requests. They provide access to
 The following code presents an example of an intercepting an incoming unary RPC:
 
 ```csharp
-public class ServerLoggingInterceptor : Interceptor
+public class ServerLoggerInterceptor : Interceptor
 {
     private readonly ILogger _logger;
 
-    public ServerLoggingInterceptor(ILogger<ServerLoggingInterceptor> logger)
+    public ServerLoggerInterceptor(ILogger<ServerLoggerInterceptor> logger)
     {
         _logger = logger;
     }
@@ -296,3 +296,4 @@ gRPC Interceptor differences from ASP.NET Core Middleware:
 * <xref:grpc/services>
 * <xref:grpc/client>
 * [Example of how to use gRPC on the client and server (`grpc/grpc-dotnet` GitHub repository)](https://github.com/grpc/grpc-dotnet/tree/master/examples#interceptor)
+* [Configure interceptors in a gRPC client factory in .NET](xref:grpc/clientfactory#configure-interceptors)
